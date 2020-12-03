@@ -8,15 +8,30 @@
 CREATE TABLE IF NOT EXISTS users (
     id varchar(128) NOT NULL,
     username varchar(128) NOT NULL UNIQUE, -- Immutable username
-    display_name varchar(256) NOT NULL, -- Mutable username
-    name varchar(128) DEFAULT NULL,
-    surname varchar(128) DEFAULT NULL,
+    display_name varchar(256) NOT NULL,
     bio varchar(256) DEFAULT NULL,
     picture varchar(2048) DEFAULT NULL,
     create_time timestamp without time zone DEFAULT (now() at time zone 'utc'),
     update_time timestamp without time zone DEFAULT (now() at time zone 'utc'),
     active boolean DEFAULT true,
     PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS user_auth (
+    username varchar(128) NOT NULL,
+    password varchar(512) NOT NULL,
+    create_time timestamp without time zone DEFAULT (now() at time zone 'utc'),
+    update_time timestamp without time zone DEFAULT (now() at time zone 'utc'),
+    CONSTRAINT fk_username FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
+    PRIMARY KEY (username)
+);
+
+CREATE TABLE IF NOT EXISTS user_preferred_username (
+    user_id varchar(128) NOT NULL,
+    preferred_username varchar(128) NOT NULL, -- Mutable username
+    create_time timestamp without time zone DEFAULT (now() at time zone 'utc'),
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, preferred_username)
 );
 
 CREATE TABLE IF NOT EXISTS user_friend_requests (
